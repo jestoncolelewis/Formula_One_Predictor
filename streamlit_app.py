@@ -21,21 +21,7 @@ predictors = ["grid", "position", "pos_delta", "driver_code", "constructor_code"
 data = build_data()
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
-dutch_gp = pd.DataFrame(
-    {
-        "grid": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-        "position": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-        "pos_delta": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-        "driver_code": [343, 617, 461, 519, 580, 699, 607,  20, 583, 670, 756,  14, 290,
-       425, 102, 798, 705, 379, 855, 693],
-        "constructor_code": [136, 131,  69, 165, 131,  69, 165,  11,   5, 162,  11, 208,   5,
-        79, 168, 162, 208,  79, 168, 136],
-        "circuit_code": [39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39],
-         "grid_rolling": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-         "position_rolling": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-         "pos_delta_rolling": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
-    }
-)
+dutch_gp = pd.read_csv("./data/dutch_rolling.csv")
 
 model = build_model()
 
