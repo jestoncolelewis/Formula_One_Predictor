@@ -5,4 +5,3 @@ streamlit
 numpy
 tensorflow
 tensorflow-decision-forests
-ydf == 0.5.0
