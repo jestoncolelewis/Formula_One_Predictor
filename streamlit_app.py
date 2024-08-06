@@ -43,8 +43,9 @@ predictions = model.predict(test[predictors])
 predictions_df = pd.DataFrame(predictions)
 
 evaluation = model.evaluate(test[predictors])
+eval_perc = evaluation.accuracy * 100
 
-st.header(f"Test accuracy - {evaluation.accuracy:.2f}%")
+st.header(f"Test accuracy - {eval_perc:.2f}%")
 
 full_table = pd.merge(test, predictions_df, on=test.index)
 full_table["max_pred"] = full_table[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]].max(axis=1)
@@ -56,9 +57,11 @@ dutch_pred = model.predict(dutch_gp)
 dutch_pred_df = pd.DataFrame(dutch_pred)
 
 dutch_eval = model.evaluate(dutch_gp)
+dutch_eval_perc = dutch_eval.accuracy * 100
 
-st.header(f"Single test accuracy - {dutch_eval.accuracy:.2f}%")
+st.header(f"Single test accuracy - {dutch_eval_perc:.2f}%")
 dutch_full = pd.merge(dutch_gp, dutch_pred_df, on=dutch_gp.index)
 
 dutch_full["max_pred"] = dutch_full[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]].max(axis=1)
-st.table(dutch_full)
+
+st.table(dutch_full[["driverRef", "constructorRef", "position", "circuitRef", "max_pred"]])
