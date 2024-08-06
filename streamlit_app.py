@@ -7,8 +7,8 @@ import numpy as np
 st.title("Jeston Lewis - Capstone Project")
 
 @st.cache_data
-def build_data():
-    data = pd.read_csv("./data/final_rolling.csv")
+def build_data(path):
+    data = pd.read_csv(path)
     data.dropna(subset="position", inplace=True)
     data["position"] = data["position"].astype("int")
     return data
@@ -18,10 +18,10 @@ def build_model():
     return ydf.RandomForestLearner(label="position").train(training[predictors])
 
 predictors = ["grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling", "position_rolling", "pos_delta_rolling"]
-data = build_data()
+data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
-dutch_gp = pd.read_csv("./data/dutch_rolling.csv")
+dutch_gp = build_data("./data/dutch_rolling.csv")
 
 model = build_model()
 
