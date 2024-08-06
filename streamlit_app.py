@@ -81,6 +81,7 @@ with st.form("Predict a winner"):
 
 driver_df = None
 
+# TODO change below to function
 if submit:
     driver_code = dutch_gp["driver_code"].loc[dutch_gp["driverRef"] == driver_choice]
     constructor_code = dutch_gp["constructor_code"].loc[dutch_gp["driverRef"] == driver_choice]
