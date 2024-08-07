@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 import tensorflow_decision_forests as tfdf
-import numpy as np
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 
