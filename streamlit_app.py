@@ -25,6 +25,37 @@ def build_model(training):
     return model
 
 
+def make_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
+    driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
+    constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
+    circuit_code = local_data["circuit_code"].loc[local_data["driverRef"] == driver_choice].values[0]
+    grid_rolling = local_data["grid_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
+    position_rolling = local_data["position_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
+    pos_delta_rolling = local_data["pos_delta_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
+    pos_delta = starting_choice - position_choice
+    driver_df = pd.DataFrame(
+        {
+            "driver_code": [driver_code],
+            "constructor_code": [constructor_code],
+            "circuit_code": [circuit_code],
+            "grid_rolling": [grid_rolling],
+            "position_rolling": [position_rolling],
+            "pos_delta_rolling": [pos_delta_rolling],
+            "grid": [starting_choice],
+            "position": [position_choice],
+            "pos_delta": [pos_delta]
+        }
+    )
+
+    driver_ds = tfdf.keras.pd_dataframe_to_tf_dataset(driver_df)
+    driver_prediction = model.predict(driver_ds)
+    driver_prediction_df = pd.DataFrame(driver_prediction)
+    driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
+    driver_full["max_pred"] = driver_full[preds].max(axis=1)
+    driver_full["driverRef"] = driver_choice
+    st.table(driver_full[["driverRef", "position", "max_pred"]])
+
+
 predictors = [
     "grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling",
     "position_rolling", "pos_delta_rolling"
@@ -72,43 +103,12 @@ dutch_full["max_pred"] = dutch_full[preds].max(axis=1)
 st.table(dutch_full[["driverRef", "constructorRef", "position", "circuitRef", "max_pred"]])
 
 with st.form("Predict a winner"):
-    driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
-    circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
-    position_choice = st.selectbox("Position", full_table["position"].unique())
-    starting_choice = st.selectbox("Starting", full_table["grid"].unique())
+    f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
+    f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
+    f_position_choice = st.selectbox("Position", full_table["position"].unique())
+    f_starting_choice = st.selectbox("Starting", full_table["grid"].unique())
 
     submit = st.form_submit_button("Predict")
 
-driver_df = None
-
-# TODO change below to function
-if submit:
-    driver_code = dutch_gp["driver_code"].loc[dutch_gp["driverRef"] == driver_choice]
-    constructor_code = dutch_gp["constructor_code"].loc[dutch_gp["driverRef"] == driver_choice]
-    circuit_code = dutch_gp["circuit_code"].loc[dutch_gp["driverRef"] == driver_choice]
-    grid_rolling = dutch_gp["grid_rolling"].loc[dutch_gp["driverRef"] == driver_choice]
-    position_rolling = dutch_gp["position_rolling"].loc[dutch_gp["driverRef"] == driver_choice]
-    pos_delta_rolling = dutch_gp["pos_delta_rolling"].loc[dutch_gp["driverRef"] == driver_choice]
-
-    driver_df = pd.DataFrame(
-        {
-            "grid": [starting_choice],
-            "position": [position_choice],
-            "pos_delta": [np.nan],
-            "driver_code": [driver_code.values[0]],
-            "constructor_code": [constructor_code.values[0]],
-            "circuit_code": [circuit_code.values[0]],
-            "grid_rolling": [grid_rolling.values[0]],
-            "position_rolling": [position_rolling.values[0]],
-            "pos_delta_rolling": [pos_delta_rolling.values[0]]
-        }
-    )
-
-if driver_df is not None:
-    driver_ds = tfdf.keras.pd_dataframe_to_tf_dataset(driver_df)
-    driver_prediction = model.predict(driver_ds)
-    driver_prediction_df = pd.DataFrame(driver_prediction)
-    driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
-    driver_full["max_pred"] = driver_full[preds].max(axis=1)
-    driver_full["driverRef"] = driver_choice
-    st.table(driver_full[["driverRef", "position", "max_pred"]])
+    if submit:
+        make_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp)
