@@ -11,18 +11,18 @@ st.title("Jeston Lewis - Capstone Project")
 
 @st.cache_data
 def build_data(path):
-    data = pd.read_csv(path)
-    data.dropna(subset="position", inplace=True)
-    data["position"] = data["position"].astype("int")
-    return data
+    local_data = pd.read_csv(path)
+    local_data.dropna(subset="position", inplace=True)
+    local_data["position"] = local_data["position"].astype("int")
+    return local_data
 
 
 @st.cache_resource
-def build_model(training):
-    train_ds = tfdf.keras.pd_dataframe_to_tf_dataset(training[predictors], label="position")
-    model = tfdf.keras.RandomForestModel(verbose=0)
-    model.fit(train_ds)
-    return model
+def build_model(local_training):
+    train_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_training[predictors], label="position")
+    local_model = tfdf.keras.RandomForestModel(verbose=0)
+    local_model.fit(train_ds)
+    return local_model
 
 
 def make_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
