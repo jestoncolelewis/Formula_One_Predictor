@@ -24,7 +24,7 @@ def build_model(local_training):
     return local_model
 
 
-def make_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
+def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
     driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     circuit_code = local_data["circuit_code"].loc[local_data["driverRef"] == driver_choice].values[0]
@@ -110,4 +110,4 @@ with st.form("Predict a winner"):
     submit = st.form_submit_button("Predict")
 
     if submit:
-        make_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp)
+        make_form_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp)
