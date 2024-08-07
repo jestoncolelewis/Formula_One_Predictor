@@ -24,6 +24,22 @@ def build_model(local_training):
     return local_model
 
 
+def make_prediction(local_model, local_data_ds, local_data):
+    predictions = local_model.predict(local_data_ds)
+    predictions_df = pd.DataFrame(predictions)
+
+    evaluation = local_model.make_inspector().evaluation()
+    local_eval_perc = evaluation.accuracy * 100
+
+    preds = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33
+    ]
+    full_table = pd.merge(local_data, predictions_df, on=local_data.index)
+    full_table["max_pred"] = full_table[preds].max(axis=1)
+    return local_eval_perc, full_table
+
+
 def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
     driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
@@ -46,6 +62,10 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
         }
     )
 
+    preds = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33
+    ]
     driver_ds = tfdf.keras.pd_dataframe_to_tf_dataset(driver_df)
     driver_prediction = model.predict(driver_ds)
     driver_prediction_df = pd.DataFrame(driver_prediction)
@@ -69,35 +89,18 @@ dutch_gp_ds = tfdf.keras.pd_dataframe_to_tf_dataset(dutch_gp[predictors])
 
 model = build_model(training)
 
-predictions = model.predict(test_ds)
-predictions_df = pd.DataFrame(predictions)
-
-evaluation = model.make_inspector().evaluation()
-eval_perc = evaluation.accuracy * 100
+eval_perc, full_table = make_prediction(model, test_ds, test)
 
 st.header(f"Test accuracy - {eval_perc:.2f}%")
 
-preds = [
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, 32, 33
-]
-full_table = pd.merge(test, predictions_df, on=test.index)
-full_table["max_pred"] = full_table[preds].max(axis=1)
 single = full_table[
     ["raceId", "driverRef", "constructorRef", "position", "circuitRef", "max_pred"]
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
-dutch_pred = model.predict(dutch_gp_ds)
-dutch_pred_df = pd.DataFrame(dutch_pred)
-
-dutch_eval = model.make_inspector().evaluation()
-dutch_eval_perc = dutch_eval.accuracy * 100
+dutch_eval_perc, dutch_full = make_prediction(model, dutch_gp_ds, dutch_gp)
 
 st.header(f"Single test accuracy - {dutch_eval_perc:.2f}%")
-dutch_full = pd.merge(dutch_gp, dutch_pred_df, on=dutch_gp.index)
-
-dutch_full["max_pred"] = dutch_full[preds].max(axis=1)
 
 st.table(dutch_full[["driverRef", "constructorRef", "position", "circuitRef", "max_pred"]])
 
