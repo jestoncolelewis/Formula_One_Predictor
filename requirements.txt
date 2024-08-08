@@ -3,5 +3,5 @@ fastf1
 jupyter
 streamlit
 numpy
-tensorflow
+tensorflow == 2.16.1
 tensorflow-decision-forests
