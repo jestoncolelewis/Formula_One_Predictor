@@ -40,10 +40,10 @@ def make_prediction(local_model, local_data_ds, local_data):
     return local_eval_perc, local_table
 
 
-def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data):
+def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data, local_circuits):
     driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
-    circuit_code = local_data["circuit_code"].loc[local_data["driverRef"] == driver_choice].values[0]
+    circuit_code = local_circuits["circuit_code"].loc[local_circuits["circuitRef"] == circuit_choice].values[0]
     grid_rolling = local_data["grid_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     position_rolling = local_data["position_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     pos_delta_rolling = local_data["pos_delta_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
@@ -72,7 +72,8 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
     driver_full["max_pred"] = driver_full[preds].max(axis=1)
     driver_full["driverRef"] = driver_choice
-    st.table(driver_full[["driverRef", "position", "max_pred"]])
+    driver_full["circuit_choice"] = circuit_choice
+    st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]])
 
 
 predictors = [
@@ -84,8 +85,11 @@ training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
 dutch_gp = build_data("./data/dutch_rolling.csv")
 
+circuits = pd.DataFrame()
+circuits["circuit_code"] = data["circuit_code"].unique()
+circuits["circuitRef"] = data["circuitRef"].unique()
+
 test_ds = tfdf.keras.pd_dataframe_to_tf_dataset(test[predictors])
-dutch_gp_ds = tfdf.keras.pd_dataframe_to_tf_dataset(dutch_gp[predictors])
 
 model = build_model(training)
 
@@ -98,12 +102,6 @@ single = full_table[
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
-dutch_eval_perc, dutch_full = make_prediction(model, dutch_gp_ds, dutch_gp)
-
-st.header(f"Single test accuracy - {dutch_eval_perc:.2f}%")
-
-st.table(dutch_full[["driverRef", "constructorRef", "position", "circuitRef", "max_pred"]])
-
 with st.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
@@ -113,4 +111,4 @@ with st.form("Predict a winner"):
     submit = st.form_submit_button("Predict")
 
     if submit:
-        make_form_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp)
+        make_form_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp, circuits)
