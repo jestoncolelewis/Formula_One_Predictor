@@ -6,9 +6,6 @@ import tensorflow_decision_forests as tfdf
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 
-st.title("Jeston Lewis - Capstone Project")
-
-
 @st.cache_data
 def build_data(path):
     local_data = pd.read_csv(path)
@@ -80,6 +77,8 @@ preds = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
     30, 31, 32, 33
 ]
+
+st.title("Jeston Lewis - Capstone Project")
 
 # Build model
 model = build_model(training)
