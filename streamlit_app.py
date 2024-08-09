@@ -103,6 +103,22 @@ single = full_table[
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
+logs = model.make_inspector().training_logs()
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot([log.num_trees for log in logs], [log.evaluation.accuracy for log in logs])
+plt.xlabel("Number of trees")
+plt.ylabel("Accuracy (out-of-bag)")
+
+plt.subplot(1, 2, 2)
+plt.plot([log.num_trees for log in logs], [log.evaluation.loss for log in logs])
+plt.xlabel("Number of trees")
+plt.ylabel("Logloss (out-of-bag)")
+
+st.pyplot(plt)
+
 with st.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
