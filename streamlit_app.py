@@ -25,14 +25,10 @@ def build_model(local_training):
     return local_model
 
 
-def make_prediction(local_model, local_data_ds, local_data):
+def make_prediction(local_model, local_data):
+    local_data_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_data[predictors])
     predictions = local_model.predict(local_data_ds)
     predictions_df = pd.DataFrame(predictions)
-
-    preds = [
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32, 33
-    ]
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
     local_table["max_pred"] = local_table[preds].max(axis=1)
     return local_table
@@ -59,11 +55,6 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
             "pos_delta": [pos_delta]
         }
     )
-
-    preds = [
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-        30, 31, 32, 33
-    ]
     driver_ds = tfdf.keras.pd_dataframe_to_tf_dataset(driver_df)
     driver_prediction = model.predict(driver_ds)
     driver_prediction_df = pd.DataFrame(driver_prediction)
@@ -81,13 +72,14 @@ dutch_gp = build_data("./data/dutch_rolling.csv")
 circuits = pd.DataFrame()
 circuits["circuit_code"] = data["circuit_code"].unique()
 circuits["circuitRef"] = data["circuitRef"].unique()
-
-# TODO: move to build_model function
 predictors = [
     "grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling",
     "position_rolling", "pos_delta_rolling"
 ]
-test_ds = tfdf.keras.pd_dataframe_to_tf_dataset(test[predictors])
+preds = [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33
+]
 
 # Build model
 model = build_model(training)
@@ -99,7 +91,7 @@ eval_perc = evaluation.accuracy * 100
 st.header(f"Test accuracy - {eval_perc:.2f}%")
 
 # Single race table
-full_table = make_prediction(model, test_ds, test)
+full_table = make_prediction(model, test)
 single = full_table[
     ["raceId", "driverRef", "constructorRef", "position", "circuitRef", "max_pred"]
 ].loc[full_table["raceId"] == 1134]
