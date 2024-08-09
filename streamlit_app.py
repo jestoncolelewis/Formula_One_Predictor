@@ -74,35 +74,39 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]])
 
 
-predictors = [
-    "grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling",
-    "position_rolling", "pos_delta_rolling"
-]
 data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
 dutch_gp = build_data("./data/dutch_rolling.csv")
-
 circuits = pd.DataFrame()
 circuits["circuit_code"] = data["circuit_code"].unique()
 circuits["circuitRef"] = data["circuitRef"].unique()
 
+# TODO: move to build_model function
+predictors = [
+    "grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling",
+    "position_rolling", "pos_delta_rolling"
+]
 test_ds = tfdf.keras.pd_dataframe_to_tf_dataset(test[predictors])
 
+# Build model
 model = build_model(training)
 inspector = model.make_inspector()
 
-full_table = make_prediction(model, test_ds, test)
-
+# Evaluator
 evaluation = inspector.evaluation()
 eval_perc = evaluation.accuracy * 100
 st.header(f"Test accuracy - {eval_perc:.2f}%")
 
+# Single race table
+full_table = make_prediction(model, test_ds, test)
 single = full_table[
     ["raceId", "driverRef", "constructorRef", "position", "circuitRef", "max_pred"]
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
+# Log plotting
+# TODO: come up with unique things to plot
 logs = inspector.training_logs()
 
 plt.figure(figsize=(12, 4))
@@ -119,6 +123,7 @@ plt.ylabel("Logloss (out-of-bag)")
 
 st.pyplot(plt)
 
+# Prediction form
 with st.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
