@@ -29,16 +29,13 @@ def make_prediction(local_model, local_data_ds, local_data):
     predictions = local_model.predict(local_data_ds)
     predictions_df = pd.DataFrame(predictions)
 
-    evaluation = local_model.make_inspector().evaluation()
-    local_eval_perc = evaluation.accuracy * 100
-
     preds = [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
         30, 31, 32, 33
     ]
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
     local_table["max_pred"] = local_table[preds].max(axis=1)
-    return local_eval_perc, local_table
+    return local_table
 
 
 def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data, local_circuits):
@@ -93,9 +90,12 @@ circuits["circuitRef"] = data["circuitRef"].unique()
 test_ds = tfdf.keras.pd_dataframe_to_tf_dataset(test[predictors])
 
 model = build_model(training)
+inspector = model.make_inspector()
 
-eval_perc, full_table = make_prediction(model, test_ds, test)
+full_table = make_prediction(model, test_ds, test)
 
+evaluation = inspector.evaluation()
+eval_perc = evaluation.accuracy * 100
 st.header(f"Test accuracy - {eval_perc:.2f}%")
 
 single = full_table[
@@ -103,7 +103,7 @@ single = full_table[
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
-logs = model.make_inspector().training_logs()
+logs = inspector.training_logs()
 
 plt.figure(figsize=(12, 4))
 
