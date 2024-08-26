@@ -80,7 +80,7 @@ preds = [
 
 st.title("Jeston Lewis - Capstone Project")
 
-# Build model
+# Build model and inspector
 model = build_model(training)
 inspector = model.make_inspector()
 
