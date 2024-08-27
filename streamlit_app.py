@@ -113,6 +113,10 @@ plt.ylabel("Logloss (out-of-bag)")
 
 st.pyplot(plt)
 
+# Plot tree
+tree = inspector.extract_tree(tree_idx=0)
+st.write(tree)
+
 # Prediction form
 with st.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
