@@ -146,8 +146,8 @@ st.write(tree)
 with st.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
-    f_position_choice = st.selectbox("Position", full_table["position"].unique())
-    f_starting_choice = st.selectbox("Starting", full_table["grid"].unique())
+    f_starting_choice = st.selectbox("Start", full_table["grid"].unique())
+    f_position_choice = st.selectbox("Finish", full_table["position"].unique())
 
     submit = st.form_submit_button("Predict")
 
