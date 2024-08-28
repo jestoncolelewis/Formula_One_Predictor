@@ -116,7 +116,9 @@ full_table = make_prediction(model, test)
 single = full_table[
     ["driverRef", "constructorRef", "grid", "circuitRef", 1]
 ].loc[full_table["raceId"] == 1134]
-st.table(single)
+single.sort_values(by="grid", inplace=True)
+single["grid"] = single["grid"].astype(int)
+st.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True)
 
 # Log plotting
 # TODO: come up with unique things to plot
