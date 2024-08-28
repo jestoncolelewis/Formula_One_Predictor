@@ -29,28 +29,28 @@ def make_prediction(local_model, local_data):
     predictions_df = pd.DataFrame(predictions)
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
     local_table["max_pred"] = local_table[preds].max(axis=1)
-    driverRefs = local_table["driverRef"].unique()
-    circuitRefs = local_table["circuitRef"].unique()
-    constructorRefs = local_table["constructorRef"].unique()
-    driverReal = np.array([
+    driver_refs = local_table["driverRef"].unique()
+    circuit_refs = local_table["circuitRef"].unique()
+    constructor_refs = local_table["constructorRef"].unique()
+    driver_real = np.array([
         "Charles Leclerc", "Carlos Sainz", "Lewis Hamilton", "George Russell","Kevin Magnussen", "Valtteri Bottas",
         "Esteban Ocon", "Yuki Tsunoda", "Fernando Alonso", "Zhou Guanyu", "Mick Schumacher", "Lance Stroll",
         "Alex Albon", "Daniel Ricciardo", "Lando Norris", "Nicholas Latifi", "Nico Hulkenberg", "Checo Perez",
         "Max Verstappen", "Pierre Gasly", "Sebastian Vettel", "Nyk De Vries", "Logan Sargeant", "Oscar Piastri",
         "Liam Lawson", "Oliver Bearman"
     ])
-    circuitReal = np.array([
+    circuit_real = np.array([
         "Bahrain", "Jeddah", "Albert Park", "Imola", "Miami", "Catalunya", "Monaco", "Baku", "Villeneuve",
         "Silverstone", "Red Bull Ring", "Ricard", "Hungaroring", "Spa", "Zandvoort", "Monza", "Marina Bay", "Suzuka",
         "Circuit of the Americas", "Rodriquez", "Interlagos", "Yas Marina", "Losail", "Las Vegas", "Shanghai"
     ])
-    constructorReal = np.array([
+    constructor_real = np.array([
         "Ferrari", "Mercedes", "Haas", "Alfa Romeo", "Alpine", "Alphatauri", "Aston Martin", "Williams", "Mclaren",
         "Red Bull", "Sauber", "RB"
     ])
-    local_table.replace(driverRefs, driverReal, inplace=True)
-    local_table.replace(circuitRefs, circuitReal, inplace=True)
-    local_table.replace(constructorRefs, constructorReal, inplace=True)
+    local_table.replace(driver_refs, driver_real, inplace=True)
+    local_table.replace(circuit_refs, circuit_real, inplace=True)
+    local_table.replace(constructor_refs, constructor_real, inplace=True)
     return local_table
 
 
