@@ -29,28 +29,6 @@ def make_prediction(local_model, local_data):
     predictions_df = pd.DataFrame(predictions)
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
     local_table["max_pred"] = local_table[preds].max(axis=1)
-    driver_refs = local_table["driverRef"].unique()
-    circuit_refs = local_table["circuitRef"].unique()
-    constructor_refs = local_table["constructorRef"].unique()
-    driver_real = np.array([
-        "Charles Leclerc", "Carlos Sainz", "Lewis Hamilton", "George Russell","Kevin Magnussen", "Valtteri Bottas",
-        "Esteban Ocon", "Yuki Tsunoda", "Fernando Alonso", "Zhou Guanyu", "Mick Schumacher", "Lance Stroll",
-        "Alex Albon", "Daniel Ricciardo", "Lando Norris", "Nicholas Latifi", "Nico Hulkenberg", "Checo Perez",
-        "Max Verstappen", "Pierre Gasly", "Sebastian Vettel", "Nyk De Vries", "Logan Sargeant", "Oscar Piastri",
-        "Liam Lawson", "Oliver Bearman"
-    ])
-    circuit_real = np.array([
-        "Bahrain", "Jeddah", "Albert Park", "Imola", "Miami", "Catalunya", "Monaco", "Baku", "Villeneuve",
-        "Silverstone", "Red Bull Ring", "Ricard", "Hungaroring", "Spa", "Zandvoort", "Monza", "Marina Bay", "Suzuka",
-        "Circuit of the Americas", "Rodriquez", "Interlagos", "Yas Marina", "Losail", "Las Vegas", "Shanghai"
-    ])
-    constructor_real = np.array([
-        "Ferrari", "Mercedes", "Haas", "Alfa Romeo", "Alpine", "Alphatauri", "Aston Martin", "Williams", "Mclaren",
-        "Red Bull", "Sauber", "RB"
-    ])
-    local_table.replace(driver_refs, driver_real, inplace=True)
-    local_table.replace(circuit_refs, circuit_real, inplace=True)
-    local_table.replace(constructor_refs, constructor_real, inplace=True)
     return local_table
 
 
@@ -85,6 +63,37 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]])
 
 
+def update_names(local_table):
+    driver_refs = local_table["driverRef"].unique()
+    circuit_refs = local_table["circuitRef"].unique()
+    constructor_refs = local_table["constructorRef"].unique()
+    driver_real = np.array([])
+    for driver in driver_refs:
+        if driver.find("_") != -1:
+            driver = driver.replace("_", " ")
+        driver = driver.title()
+        driver_real = np.append(driver_real, driver)
+
+    circuit_real = np.array([])
+    for circuit in circuit_refs:
+        if circuit.find("_") != -1:
+            circuit = circuit.replace("_", " ")
+        circuit = circuit.title()
+        circuit_real = np.append(circuit_real, circuit)
+
+    constructor_real = np.array([])
+    for constructor in constructor_refs:
+        if constructor.find("_") != -1:
+            constructor = constructor.replace("_", " ")
+        constructor = constructor.title()
+        constructor_real = np.append(constructor_real, constructor)
+
+    local_table.replace(driver_refs, driver_real, inplace=True)
+    local_table.replace(circuit_refs, circuit_real, inplace=True)
+    local_table.replace(constructor_refs, constructor_real, inplace=True)
+    return local_table
+
+
 data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
@@ -113,9 +122,9 @@ st.header(f"Test accuracy - {eval_perc:.2f}%")
 
 # Single race table
 full_table = make_prediction(model, test)
-single = full_table[
+single = update_names(full_table[
     ["driverRef", "constructorRef", "grid", "circuitRef", 1]
-].loc[full_table["raceId"] == 1134]
+].loc[full_table["raceId"] == 1134])
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 st.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True)
