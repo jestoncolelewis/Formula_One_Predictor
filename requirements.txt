@@ -1,8 +1,8 @@
-pandas
-fastf1
-jupyter
-streamlit
-numpy
+pandas == 2.2.2
+fastf1 == 3.4.0
+jupyter == 1.0.0
+streamlit == 1.37.0
+numpy == 1.26.4
 tensorflow == 2.16.1
-tensorflow-decision-forests
-matplotlib
+tensorflow-decision-forests == 1.9.0
+matplotlib == 3.9.1
