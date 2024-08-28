@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import os
 import matplotlib.pyplot as plt
 import tensorflow_decision_forests as tfdf
@@ -28,6 +29,28 @@ def make_prediction(local_model, local_data):
     predictions_df = pd.DataFrame(predictions)
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
     local_table["max_pred"] = local_table[preds].max(axis=1)
+    driverRefs = local_table["driverRef"].unique()
+    circuitRefs = local_table["circuitRef"].unique()
+    constructorRefs = local_table["constructorRef"].unique()
+    driverReal = np.array([
+        "Charles Leclerc", "Carlos Sainz", "Lewis Hamilton", "George Russell","Kevin Magnussen", "Valtteri Bottas",
+        "Esteban Ocon", "Yuki Tsunoda", "Fernando Alonso", "Zhou Guanyu", "Mick Schumacher", "Lance Stroll",
+        "Alex Albon", "Daniel Ricciardo", "Lando Norris", "Nicholas Latifi", "Nico Hulkenberg", "Checo Perez",
+        "Max Verstappen", "Pierre Gasly", "Sebastian Vettel", "Nyk De Vries", "Logan Sargeant", "Oscar Piastri",
+        "Liam Lawson", "Oliver Bearman"
+    ])
+    circuitReal = np.array([
+        "Bahrain", "Jeddah", "Albert Park", "Imola", "Miami", "Catalunya", "Monaco", "Baku", "Villeneuve",
+        "Silverstone", "Red Bull Ring", "Ricard", "Hungaroring", "Spa", "Zandvoort", "Monza", "Marina Bay", "Suzuka",
+        "Circuit of the Americas", "Rodriquez", "Interlagos", "Yas Marina", "Losail", "Las Vegas", "Shanghai"
+    ])
+    constructorReal = np.array([
+        "Ferrari", "Mercedes", "Haas", "Alfa Romeo", "Alpine", "Alphatauri", "Aston Martin", "Williams", "Mclaren",
+        "Red Bull", "Sauber", "RB"
+    ])
+    local_table.replace(driverRefs, driverReal, inplace=True)
+    local_table.replace(circuitRefs, circuitReal, inplace=True)
+    local_table.replace(constructorRefs, constructorReal, inplace=True)
     return local_table
 
 
@@ -91,7 +114,7 @@ st.header(f"Test accuracy - {eval_perc:.2f}%")
 # Single race table
 full_table = make_prediction(model, test)
 single = full_table[
-    ["raceId", "driverRef", "constructorRef", "position", "circuitRef", "max_pred"]
+    ["driverRef", "constructorRef", "grid", "circuitRef", 1]
 ].loc[full_table["raceId"] == 1134]
 st.table(single)
 
