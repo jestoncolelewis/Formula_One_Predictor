@@ -151,7 +151,6 @@ single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
 # Log plotting
-# TODO: come up with unique things to plot
 logs = inspector.training_logs()
 
 plt.figure(figsize=(12, 4))
@@ -168,7 +167,6 @@ plt.ylabel("Logloss (out-of-bag)")
 
 
 # Streamlit elements
-# TODO add tabs
 st.title("Jeston Lewis - Capstone Project")
 tab1, tab2 = st.tabs(["Analysis", "Predictor"])
 tab1.header(f"Test accuracy - {eval_perc:.2f}%")
