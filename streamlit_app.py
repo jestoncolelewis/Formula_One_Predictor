@@ -145,17 +145,15 @@ single["grid"] = single["grid"].astype(int)
 # Log plotting
 logs = inspector.training_logs()
 
-plt.figure(figsize=(12, 4))
+fig, axs = plt.subplots(2, 1, layout="constrained")
 
-plt.subplot(1, 2, 1)
-plt.plot([log.num_trees for log in logs], [log.evaluation.accuracy for log in logs])
-plt.xlabel("Number of trees")
-plt.ylabel("Accuracy (out-of-bag)")
+axs[0].plot([log.num_trees for log in logs], [log.evaluation.accuracy for log in logs])
+axs[0].set_xlabel("Number of trees")
+axs[0].set_ylabel("Accuracy (out-of-bag)")
 
-plt.subplot(1, 2, 2)
-plt.plot([log.num_trees for log in logs], [log.evaluation.loss for log in logs])
-plt.xlabel("Number of trees")
-plt.ylabel("Logloss (out-of-bag)")
+axs[1].plot([log.num_trees for log in logs], [log.evaluation.loss for log in logs])
+axs[1].set_xlabel("Number of trees")
+axs[1].set_ylabel("Logloss (out-of-bag)")
 
 
 # Streamlit elements
