@@ -169,11 +169,11 @@ tab1.dataframe(
     use_container_width=True,
     hide_index=True,
     height=738,
-) # Single race prediction TODO add more columns and highlight max
+) # Single race prediction TODO highlight max better
 tab1.title("Visualizations of the model")
 col1, col2 = tab1.columns(2)
 col1.header("Log plots")
-col1.pyplot(plt) # Plot logs TODO keep?
+col1.pyplot(plt) # Plot logs
 col2.header("Single tree plot")
 col2.image(viz, use_column_width=True) # Plot tree
 
