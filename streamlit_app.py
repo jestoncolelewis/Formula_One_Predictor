@@ -112,6 +112,7 @@ def update_names(local_table):
     return local_table
 
 
+# Data prep
 data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
@@ -127,8 +128,6 @@ preds = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 ]
 
-st.title("Jeston Lewis - Capstone Project")
-
 # Build model, inspector, and visualization
 model = build_model(training)
 inspector = model.make_inspector()
@@ -137,7 +136,6 @@ viz = build_viz(model, training, inspector)
 # Evaluator
 evaluation = inspector.evaluation()
 eval_perc = evaluation.accuracy * 100
-st.header(f"Test accuracy - {eval_perc:.2f}%")
 
 # Single race table
 full_table = make_prediction(model, test)
@@ -146,7 +144,6 @@ single = update_names(full_table[
 ].loc[full_table["raceId"] == 1134])
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
-st.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True)
 
 # Log plotting
 # TODO: come up with unique things to plot
@@ -164,10 +161,13 @@ plt.plot([log.num_trees for log in logs], [log.evaluation.loss for log in logs])
 plt.xlabel("Number of trees")
 plt.ylabel("Logloss (out-of-bag)")
 
-st.pyplot(plt)
 
-# Plot tree
-st.image(viz)
+# Streamlit elements
+st.title("Jeston Lewis - Capstone Project")
+st.header(f"Test accuracy - {eval_perc:.2f}%")
+st.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True) # Single race prediction
+st.pyplot(plt) # Plot logs
+st.image(viz) # Plot tree
 
 # Prediction form
 with st.form("Predict a winner"):
