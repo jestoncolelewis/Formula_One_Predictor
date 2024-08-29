@@ -81,7 +81,7 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
     driver_full["driverRef"] = driver_choice
     driver_full["circuit_choice"] = circuit_choice
-    st.table(driver_full[["driverRef", "circuit_choice", "position"]]) # TODO change to return of table
+    return driver_full[["driverRef", "circuit_choice", "position"]]
 
 
 def update_names(local_table): # TODO move to data_explorer
@@ -185,6 +185,14 @@ with tab2.form("Predict a winner"):
 
     submit = st.form_submit_button("Predict")
 
-    if submit:
-        # TODO remove dutch_gp and make more flexible
-        make_form_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp, circuits)
+if submit:
+    # TODO remove dutch_gp and make more flexible
+    prediction = make_form_prediction(
+        driver_choice=f_driver_choice,
+        circuit_choice=f_circuit_choice,
+        position_choice=f_position_choice,
+        starting_choice=f_starting_choice,
+        local_data=dutch_gp,
+        local_circuits=circuits
+    )
+    st.dataframe(prediction, use_container_width=True, hide_index=True)
