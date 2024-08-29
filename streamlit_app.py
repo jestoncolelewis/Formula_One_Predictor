@@ -172,7 +172,7 @@ tab1, tab2 = st.tabs(["Analysis", "Predictor"])
 tab1.header(f"Test accuracy - {eval_perc:.2f}%")
 tab1.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True) # Single race prediction
 tab1.pyplot(plt) # Plot logs
-tab1.image(viz) # Plot tree
+tab1.image(viz, use_column_width=True) # Plot tree
 
 # Prediction form
 with tab2.form("Predict a winner"):
