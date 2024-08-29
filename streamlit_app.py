@@ -161,7 +161,9 @@ plt.ylabel("Logloss (out-of-bag)")
 # Streamlit elements
 st.title("Jeston Lewis - Capstone Project")
 tab1, tab2 = st.tabs(["Analysis", "Predictor"])
-tab1.header(f"Test accuracy - {eval_perc:.2f}%")
+tab1.title("Single race prediction")
+tab1.write(f"Test accuracy - {eval_perc:.2f}%")
+tab1.write("Description of below table")
 tab1.dataframe(
     single.style.format({1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
                          9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
@@ -170,10 +172,16 @@ tab1.dataframe(
     hide_index=True,
     height=738,
 ) # Single race prediction TODO add more columns and highlight max
-tab1.pyplot(plt) # Plot logs TODO keep?
-tab1.image(viz, use_column_width=True) # Plot tree
+tab1.title("Visualizations of the model")
+col1, col2 = tab1.columns(2)
+col1.header("Log plots")
+col1.pyplot(plt) # Plot logs TODO keep?
+col2.header("Single tree plot")
+col2.image(viz, use_column_width=True) # Plot tree
 
 # Prediction form
+tab2.title("Race predictor")
+tab2.write("Use instructions")
 with tab2.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
