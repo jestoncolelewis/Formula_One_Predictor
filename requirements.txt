@@ -6,3 +6,4 @@ numpy == 1.26.4
 tensorflow == 2.16.1
 tensorflow-decision-forests == 1.9.0
 matplotlib == 3.9.1
+dtreeviz == 2.2.2
