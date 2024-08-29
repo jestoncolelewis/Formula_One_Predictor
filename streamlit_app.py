@@ -84,7 +84,7 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     st.table(driver_full[["driverRef", "circuit_choice", "position"]]) # TODO change to return of table
 
 
-def update_names(local_table):
+def update_names(local_table): # TODO move to data_explorer
     driver_refs = local_table["driverRef"].unique()
     circuit_refs = local_table["circuitRef"].unique()
     driver_real = np.array([])
