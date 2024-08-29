@@ -47,6 +47,7 @@ def build_viz(_local_model, local_data, _local_inspector):
 
 
 def make_prediction(local_model, local_data):
+    # TODO: remove max
     local_data_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_data[predictors])
     predictions = local_model.predict(local_data_ds)
     predictions_df = pd.DataFrame(predictions)
