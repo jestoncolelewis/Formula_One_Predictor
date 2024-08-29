@@ -79,10 +79,9 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     driver_prediction = model.predict(driver_ds)
     driver_prediction_df = pd.DataFrame(driver_prediction)
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
-    driver_full["max_pred"] = driver_full[preds].max(axis=1) # TODO remove max
     driver_full["driverRef"] = driver_choice
     driver_full["circuit_choice"] = circuit_choice
-    st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]]) # TODO change to return of table
+    st.table(driver_full[["driverRef", "circuit_choice", "position"]]) # TODO change to return of table
 
 
 def update_names(local_table):
