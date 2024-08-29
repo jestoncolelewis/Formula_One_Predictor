@@ -90,7 +90,6 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
 def update_names(local_table):
     driver_refs = local_table["driverRef"].unique()
     circuit_refs = local_table["circuitRef"].unique()
-    constructor_refs = local_table["constructorRef"].unique()
     driver_real = np.array([])
     for driver in driver_refs:
         if driver.find("_") != -1:
@@ -105,16 +104,8 @@ def update_names(local_table):
         circuit = circuit.title()
         circuit_real = np.append(circuit_real, circuit)
 
-    constructor_real = np.array([])
-    for constructor in constructor_refs:
-        if constructor.find("_") != -1:
-            constructor = constructor.replace("_", " ")
-        constructor = constructor.title()
-        constructor_real = np.append(constructor_real, constructor)
-
     local_table.replace(driver_refs, driver_real, inplace=True)
     local_table.replace(circuit_refs, circuit_real, inplace=True)
-    local_table.replace(constructor_refs, constructor_real, inplace=True)
     return local_table
 
 
@@ -146,7 +137,7 @@ eval_perc = evaluation.accuracy * 100
 # Single race table
 full_table = make_prediction(model, test)
 single = update_names(full_table[
-    ["driverRef", "constructorRef", "grid", "circuitRef", 1]
+    ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 ].loc[full_table["raceId"] == 1134])
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
@@ -172,7 +163,9 @@ st.title("Jeston Lewis - Capstone Project")
 tab1, tab2 = st.tabs(["Analysis", "Predictor"])
 tab1.header(f"Test accuracy - {eval_perc:.2f}%")
 tab1.dataframe(
-    single.style.format({1:"{:.2%}"}),
+    single.style.format({1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
+                         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
+                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}).highlight_max(),
     use_container_width=True,
     hide_index=True,
     height=738,
