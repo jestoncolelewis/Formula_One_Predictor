@@ -80,10 +80,10 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     driver_prediction = model.predict(driver_ds)
     driver_prediction_df = pd.DataFrame(driver_prediction)
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
-    driver_full["max_pred"] = driver_full[preds].max(axis=1)
+    driver_full["max_pred"] = driver_full[preds].max(axis=1) # TODO remove max
     driver_full["driverRef"] = driver_choice
     driver_full["circuit_choice"] = circuit_choice
-    st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]])
+    st.table(driver_full[["driverRef", "circuit_choice", "position", "max_pred"]]) # TODO change to return of table
 
 
 def update_names(local_table):
@@ -175,8 +175,8 @@ tab1.dataframe(
     use_container_width=True,
     hide_index=True,
     height=738,
-) # Single race prediction
-tab1.pyplot(plt) # Plot logs
+) # Single race prediction TODO add more columns and highlight max
+tab1.pyplot(plt) # Plot logs TODO keep?
 tab1.image(viz, use_column_width=True) # Plot tree
 
 # Prediction form
@@ -189,4 +189,5 @@ with tab2.form("Predict a winner"):
     submit = st.form_submit_button("Predict")
 
     if submit:
+        # TODO remove dutch_gp and make more flexible
         make_form_prediction(f_driver_choice, f_circuit_choice, f_position_choice, f_starting_choice, dutch_gp, circuits)
