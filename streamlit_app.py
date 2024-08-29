@@ -4,6 +4,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import tensorflow_decision_forests as tfdf
+import dtreeviz as dt
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 
@@ -21,6 +22,23 @@ def build_model(local_training):
     local_model = tfdf.keras.RandomForestModel(verbose=0)
     local_model.fit(train_ds)
     return local_model
+
+
+@st.cache_resource
+def build_viz(_local_model, local_data, _local_inspector):
+    local_data.dropna(inplace=True)
+    features = [f.name for f in _local_inspector.features()]
+    viz_model = dt.model(
+        model=_local_model,
+        X_train=local_data[features],
+        y_train=local_data["position"]-1,
+        feature_names=features,
+        target_name="position",
+        tree_index=0
+    )
+    local_viz = viz_model.view(depth_range_to_display=[0,5], scale=0.75, orientation="LR")
+    viz_svg = local_viz.svg()
+    return viz_svg
 
 
 def make_prediction(local_model, local_data):
@@ -111,9 +129,10 @@ preds = [
 
 st.title("Jeston Lewis - Capstone Project")
 
-# Build model and inspector
+# Build model, inspector, and visualization
 model = build_model(training)
 inspector = model.make_inspector()
+viz = build_viz(model, training, inspector)
 
 # Evaluator
 evaluation = inspector.evaluation()
@@ -148,8 +167,7 @@ plt.ylabel("Logloss (out-of-bag)")
 st.pyplot(plt)
 
 # Plot tree
-tree = inspector.extract_tree(tree_idx=0)
-st.write(tree)
+st.image(viz)
 
 # Prediction form
 with st.form("Predict a winner"):
