@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 import tensorflow_decision_forests as tfdf
 import dtreeviz as dt
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
+st.set_page_config(
+    page_title="Jeston Lewis | Capstone",
+    layout="wide",
+    menu_items=None,
+)
 
 
 @st.cache_data
@@ -163,14 +168,16 @@ plt.ylabel("Logloss (out-of-bag)")
 
 
 # Streamlit elements
+# TODO add tabs
 st.title("Jeston Lewis - Capstone Project")
-st.header(f"Test accuracy - {eval_perc:.2f}%")
-st.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True) # Single race prediction
-st.pyplot(plt) # Plot logs
-st.image(viz) # Plot tree
+tab1, tab2 = st.tabs(["Analysis", "Predictor"])
+tab1.header(f"Test accuracy - {eval_perc:.2f}%")
+tab1.dataframe(single.style.format({1:"{:.2%}"}), use_container_width=True, hide_index=True) # Single race prediction
+tab1.pyplot(plt) # Plot logs
+tab1.image(viz) # Plot tree
 
 # Prediction form
-with st.form("Predict a winner"):
+with tab2.form("Predict a winner"):
     f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
     f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
     f_starting_choice = st.selectbox("Start", full_table["grid"].unique())
