@@ -113,7 +113,7 @@ eval_perc = evaluation.accuracy * 100
 full_table = make_prediction(model, test)
 single = full_table[
     ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-].loc[full_table["raceId"] == 1134]
+].loc[full_table["raceId"] == 1134] # TODO change raceID to max
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
