@@ -113,7 +113,7 @@ eval_perc = evaluation.accuracy * 100
 full_table = make_prediction(model, test)
 single = full_table[
     ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-].loc[full_table["raceId"] == 1134] # TODO change raceID to max
+].loc[full_table["raceId"] == full_table["raceId"].max()]
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
@@ -138,13 +138,15 @@ tab1.title("Single race prediction")
 tab1.write(f"Test accuracy - {eval_perc:.2f}%")
 tab1.write("Description of below table")
 tab1.dataframe(
-    single.style.format({1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
+    single.style.format(
+        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
                          9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
-                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}).highlight_max(),
+                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
+    ).highlight_max(axis=1, subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
     use_container_width=True,
     hide_index=True,
     height=738,
-) # Single race prediction TODO highlight max better
+) # Single race prediction
 tab1.title("Visualizations of the model")
 col1, col2 = tab1.columns(2)
 col1.header("Log plots")
