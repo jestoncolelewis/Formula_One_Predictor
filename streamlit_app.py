@@ -41,7 +41,7 @@ def build_viz(_local_model, local_data, _local_inspector):
         target_name="position",
         tree_index=0
     )
-    local_viz = viz_model.view(depth_range_to_display=(0,5), scale=0.75, orientation="LR")
+    local_viz = viz_model.view(depth_range_to_display=(0,3), scale=0.75, orientation="LR")
     viz_svg = local_viz.svg()
     return viz_svg
 
