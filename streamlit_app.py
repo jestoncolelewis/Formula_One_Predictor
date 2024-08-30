@@ -130,12 +130,18 @@ axs[1].set_xlabel("Number of trees")
 axs[1].set_ylabel("Logloss (out-of-bag)")
 
 
-# Streamlit elements
+# FRONTEND
 st.title("Jeston Lewis - Capstone Project")
 tab1, tab2 = st.tabs(["Analysis", "Predictor"])
+
+# TAB 1
 tab1.title("Single race prediction")
 tab1.write(f"Test accuracy - {eval_perc:.2f}%")
-tab1.write("Description of below table")
+tab1.write("The table below shows the likelihood of each driver achieving a specific finishing position giving their "
+           "starting position or grid. For instance, the person in first at the beginning of the race (Leclerc), has a "
+           "1.67% chance of winning the race.")
+tab1.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
+           "position indicated by the column name. Hamilton has a 83% chance of finishing in 1st.")
 tab1.dataframe(
     single.style.format(
         {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
@@ -155,9 +161,13 @@ col1.pyplot(plt) # Plot logs
 col2.header("Single tree plot")
 col2.image(viz, use_column_width=True) # Plot tree
 
+# TAB 2
 # Prediction form
 tab2.title("Race predictor")
-tab2.write("Use instructions")
+tab2.write("1 - Select a driver")
+tab2.write("2 - Select a track")
+tab2.write("3 - Select a starting position")
+tab2.write("4 - Press 'Predict'")
 with tab2.form("Predict a winner"):
     f_driver_choice = st.selectbox(
         "Driver",
@@ -180,7 +190,7 @@ with tab2.form("Predict a winner"):
 
     submit = st.form_submit_button("Predict")
 
-if submit:
+if submit is True and f_driver_choice is not None and f_circuit_choice is not None and f_starting_choice is not None:
     prediction = make_form_prediction(
         driver_choice=f_driver_choice,
         circuit_choice=f_circuit_choice,
@@ -198,3 +208,5 @@ if submit:
         use_container_width=True,
         hide_index=True
     )
+if submit is True and f_driver_choice is None or f_circuit_choice is None or f_starting_choice is None:
+    tab2.write("Please select all options.")
