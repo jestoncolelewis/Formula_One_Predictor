@@ -84,28 +84,6 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     return driver_full[["driverRef", "circuit_choice", "position"]]
 
 
-def update_names(local_table): # TODO move to data_explorer
-    driver_refs = local_table["driverRef"].unique()
-    circuit_refs = local_table["circuitRef"].unique()
-    driver_real = np.array([])
-    for driver in driver_refs:
-        if driver.find("_") != -1:
-            driver = driver.replace("_", " ")
-        driver = driver.title()
-        driver_real = np.append(driver_real, driver)
-
-    circuit_real = np.array([])
-    for circuit in circuit_refs:
-        if circuit.find("_") != -1:
-            circuit = circuit.replace("_", " ")
-        circuit = circuit.title()
-        circuit_real = np.append(circuit_real, circuit)
-
-    local_table.replace(driver_refs, driver_real, inplace=True)
-    local_table.replace(circuit_refs, circuit_real, inplace=True)
-    return local_table
-
-
 # Data prep
 data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
@@ -133,9 +111,9 @@ eval_perc = evaluation.accuracy * 100
 
 # Single race table
 full_table = make_prediction(model, test)
-single = update_names(full_table[
+single = full_table[
     ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-].loc[full_table["raceId"] == 1134])
+].loc[full_table["raceId"] == 1134]
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
