@@ -54,14 +54,14 @@ def make_prediction(local_model, local_data):
     return local_table
 
 
-def make_form_prediction(driver_choice, circuit_choice, position_choice, starting_choice, local_data, local_circuits):
+def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_data, local_circuits):
     driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
     circuit_code = local_circuits["circuit_code"].loc[local_circuits["circuitRef"] == circuit_choice].values[0]
     grid_rolling = local_data["grid_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     position_rolling = local_data["position_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     pos_delta_rolling = local_data["pos_delta_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
-    pos_delta = starting_choice - position_choice
+    pos_delta = starting_choice
     driver_df = pd.DataFrame(
         {
             "driver_code": [driver_code],
@@ -71,7 +71,6 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
             "position_rolling": [position_rolling],
             "pos_delta_rolling": [pos_delta_rolling],
             "grid": [starting_choice],
-            "position": [position_choice],
             "pos_delta": [pos_delta]
         }
     )
@@ -81,14 +80,14 @@ def make_form_prediction(driver_choice, circuit_choice, position_choice, startin
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
     driver_full["driverRef"] = driver_choice
     driver_full["circuit_choice"] = circuit_choice
-    return driver_full[["driverRef", "circuit_choice", "position"]]
+    return driver_full[["driverRef", "circuit_choice", "grid", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]]
 
 
 # Data prep
 data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
-dutch_gp = build_data("./data/dutch_rolling.csv")
+current_season = data[data["year"] == data["year"].max()]
 circuits = pd.DataFrame()
 circuits["circuit_code"] = data["circuit_code"].unique()
 circuits["circuitRef"] = data["circuitRef"].unique()
@@ -142,7 +141,9 @@ tab1.dataframe(
         {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
                          9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
                          16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
-    ).highlight_max(axis=1, subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+    ).highlight_max(
+        axis=1,
+        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
     use_container_width=True,
     hide_index=True,
     height=738,
@@ -158,21 +159,42 @@ col2.image(viz, use_column_width=True) # Plot tree
 tab2.title("Race predictor")
 tab2.write("Use instructions")
 with tab2.form("Predict a winner"):
-    f_driver_choice = st.selectbox("Driver", full_table["driverRef"].unique())
-    f_circuit_choice = st.selectbox("Circuit", full_table["circuitRef"].unique())
-    f_starting_choice = st.selectbox("Start", full_table["grid"].unique())
-    f_position_choice = st.selectbox("Finish", full_table["position"].unique())
+    f_driver_choice = st.selectbox(
+        "Driver",
+        current_season["driverRef"].unique(),
+        index=None,
+        placeholder="Choose a driver"
+    )
+    f_circuit_choice = st.selectbox(
+        "Circuit",
+        current_season["circuitRef"].unique(),
+        index=None,
+        placeholder="Choose a circuit"
+    )
+    f_starting_choice = st.selectbox(
+        "Start",
+        current_season["grid"].unique(),
+        index=None,
+        placeholder="Choose a starting position"
+    )
 
     submit = st.form_submit_button("Predict")
 
 if submit:
-    # TODO remove dutch_gp and make more flexible
     prediction = make_form_prediction(
         driver_choice=f_driver_choice,
         circuit_choice=f_circuit_choice,
-        position_choice=f_position_choice,
         starting_choice=f_starting_choice,
-        local_data=dutch_gp,
+        local_data=current_season[current_season["raceId"] == current_season["raceId"].max()],
         local_circuits=circuits
     )
-    st.dataframe(prediction, use_container_width=True, hide_index=True)
+    tab2.dataframe(prediction.style.format(
+        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
+         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
+         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
+    ).highlight_max(
+        axis=1,
+        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+        use_container_width=True,
+        hide_index=True
+    )
