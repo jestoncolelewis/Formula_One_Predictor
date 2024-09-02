@@ -177,7 +177,7 @@ with tab2.form("Predict a winner"):
     )
     f_circuit_choice = st.selectbox(
         "Circuit",
-        current_season["circuitRef"].unique(),
+        current_season["circuitRef"].unique(), # TODO add all tracks for a given season
         index=None,
         placeholder="Choose a circuit"
     )
