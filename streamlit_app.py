@@ -88,6 +88,7 @@ data = build_data("./data/final_rolling.csv")
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
 current_season = data[data["year"] == data["year"].max()]
+circuits24 = pd.read_csv("./data/circuit24.csv")
 circuits = pd.DataFrame()
 circuits["circuit_code"] = data["circuit_code"].unique()
 circuits["circuitRef"] = data["circuitRef"].unique()
@@ -177,7 +178,7 @@ with tab2.form("Predict a winner"):
     )
     f_circuit_choice = st.selectbox(
         "Circuit",
-        current_season["circuitRef"].unique(), # TODO add all tracks for a given season
+        circuits24,
         index=None,
         placeholder="Choose a circuit"
     )
