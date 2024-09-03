@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
-import os
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_decision_forests as tfdf
 import dtreeviz as dt
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
 st.set_page_config(
     page_title="Jeston Lewis | Capstone",
     layout="wide",
