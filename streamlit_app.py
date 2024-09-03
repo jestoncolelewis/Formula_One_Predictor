@@ -34,7 +34,7 @@ def build_model(local_training):
     train_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_training[predictors], label="position")
     local_model = tfdf.keras.RandomForestModel(task=tfdf.keras.core.Task.CLASSIFICATION,verbose=0)
     local_model.fit(train_ds)
-    local_model.save("./model.keras")
+    local_model.save("./model")
     return local_model
 
 
@@ -110,10 +110,10 @@ preds = [
 ]
 
 # Build model, inspector, and visualization
-if load_model("./model.keras") is None:
+if load_model("./model/saved_model.pb") is None:
     model = build_model(training)
 else:
-    model = load_model("./model.keras")
+    model = load_model("./model/saved_model.pb")
 inspector = model.make_inspector()
 viz = build_viz(model, training, inspector)
 
