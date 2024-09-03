@@ -1,6 +1,6 @@
 streamlit
 pandas
-tensorflow
+tensorflow == 2.15.0
 tensorflow-decision-forests
 matplotlib
 dtreeviz
