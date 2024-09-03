@@ -23,7 +23,7 @@ def build_data(path):
 @st.cache_resource
 def build_model(local_training):
     train_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_training[predictors], label="position")
-    local_model = tfdf.keras.RandomForestModel(verbose=0)
+    local_model = tfdf.keras.RandomForestModel(task=tfdf.keras.core.Task.CLASSIFICATION,verbose=0)
     local_model.fit(train_ds)
     return local_model
 
