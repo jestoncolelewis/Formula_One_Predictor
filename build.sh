@@ -7,4 +7,4 @@ if [ $# -eq 0 ];
 fi
 
 docker image build -t jestoncolelewis/f1-predictor:$tag .
-docker run -p 80:8051 f1-predictor:$tag
+docker run jestoncolelewis/f1-predictor:$tag
