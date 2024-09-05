@@ -5,6 +5,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
         pkg-config \
+        libhdf5-dev \
         build-essential \
         curl \
         software-properties-common \
@@ -17,6 +18,7 @@ COPY ./data /app/data
 COPY ./model /app/model
 
 RUN pip3 install --upgrade pip
+RUN pip3 install --no-binary=h5py h5py
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8501
