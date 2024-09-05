@@ -6,5 +6,6 @@ if [ $# -eq 0 ];
     tag=$1
 fi
 
-docker image build -t jestoncolelewis/f1-predictor:$tag .
+docker buildx build --platform=linux/amd64,linux/arm64 --tag=jestoncolelewis/f1-predictor:$tag .
+docker push jestoncolelewis/f1-predictor:$tag
 docker run -p 80:8501 jestoncolelewis/f1-predictor:$tag
