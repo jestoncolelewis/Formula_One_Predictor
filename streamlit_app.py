@@ -37,12 +37,11 @@ def build_model(local_training):
     return local_model
 
 
-@st.cache_resource
-def build_viz(_local_model, local_data, _local_inspector):
+def build_viz(local_model, local_data, local_inspector):
     local_data.dropna(inplace=True)
-    features = [f.name for f in _local_inspector.features()]
+    features = [f.name for f in local_inspector.features()]
     viz_model = dt.model(
-        model=_local_model,
+        model=local_model,
         X_train=local_data[features],
         y_train=local_data["position"]-1,
         feature_names=features,
