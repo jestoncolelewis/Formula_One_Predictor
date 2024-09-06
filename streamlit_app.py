@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import seaborn as sns
 import tensorflow as tf
 import tensorflow_decision_forests as tfdf
 import dtreeviz as dt
+
 st.set_page_config(
     page_title="Jeston Lewis | Capstone",
     layout="wide",
@@ -127,33 +128,22 @@ single = full_table[
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
-# Log plotting
-logs = inspector.training_logs()
-
-fig, axs = plt.subplots(2, 1, layout="constrained")
-
-axs[0].plot([log.num_trees for log in logs], [log.evaluation.accuracy for log in logs])
-axs[0].set_xlabel("Number of trees")
-axs[0].set_ylabel("Accuracy (out-of-bag)")
-
-axs[1].plot([log.num_trees for log in logs], [log.evaluation.loss for log in logs])
-axs[1].set_xlabel("Number of trees")
-axs[1].set_ylabel("Logloss (out-of-bag)")
-
+# Data visualization
+lmplot = sns.lmplot(x="position", y="grid", data=data, fit_reg=False, hue="position")
 
 # FRONTEND
 st.title("Jeston Lewis - Capstone Project")
-tab1, tab2 = st.tabs(["Analysis", "Predictor"])
+predictor, analysis = st.tabs(["Predictor", "Analysis"])
 
 # TAB 1
-tab1.title("Single race prediction")
-tab1.write(f"Test accuracy - {eval_perc:.2f}%")
-tab1.write("The table below shows the likelihood of each driver achieving a specific finishing position giving their "
+analysis.title("Single race prediction")
+analysis.write(f"Test accuracy - {eval_perc:.2f}%")
+analysis.write("The table below shows the likelihood of each driver achieving a specific finishing position giving their "
            "starting position or grid. For instance, the person in first at the beginning of the race (Leclerc), has a "
            "1.67% chance of winning the race.")
-tab1.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
+analysis.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
            "position indicated by the column name. Hamilton has a 83% chance of finishing in 1st.")
-tab1.dataframe(
+analysis.dataframe(
     single.style.format(
         {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
                          9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
@@ -165,21 +155,22 @@ tab1.dataframe(
     hide_index=True,
     height=738,
 ) # Single race prediction
-tab1.title("Visualizations of the model")
-col1, col2 = tab1.columns(2)
-col1.header("Log plots")
-col1.pyplot(plt) # Plot logs
+col1, col2 = analysis.columns(2)
+col1.title("Visualizations of the data")
+col1.header("Grid vs Position")
+col1.pyplot(lmplot.fig)
+col2.title("Visualizations of the model")
 col2.header("Single tree plot")
 col2.image(viz, use_column_width=True) # Plot tree
 
 # TAB 2
 # Prediction form
-tab2.title("Race predictor")
-tab2.write("1 - Select a driver")
-tab2.write("2 - Select a track")
-tab2.write("3 - Select a starting position")
-tab2.write("4 - Press 'Predict'")
-with tab2.form("Predict a winner"):
+predictor.title("Race predictor")
+predictor.write("1 - Select a driver")
+predictor.write("2 - Select a track")
+predictor.write("3 - Select a starting position")
+predictor.write("4 - Press 'Predict'")
+with predictor.form("Predict a winner"):
     f_driver_choice = st.selectbox(
         "Driver",
         current_season["driverRef"].unique(),
@@ -209,7 +200,7 @@ if submit is True and f_driver_choice is not None and f_circuit_choice is not No
         local_data=current_season[current_season["raceId"] == current_season["raceId"].max()],
         local_circuits=circuits
     )
-    tab2.dataframe(prediction.style.format(
+    predictor.dataframe(prediction.style.format(
         {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
          9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
          16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
@@ -220,4 +211,4 @@ if submit is True and f_driver_choice is not None and f_circuit_choice is not No
         hide_index=True
     )
 if submit is True and f_driver_choice is None or f_circuit_choice is None or f_starting_choice is None:
-    tab2.write("Please select all options.")
+    predictor.write("Please select all options.")
