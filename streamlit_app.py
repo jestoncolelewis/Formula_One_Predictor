@@ -21,7 +21,7 @@ def build_data(path):
 
 
 @st.cache_resource
-def load_model(path):
+def load_saved_model(path):
     try:
         return tf.keras.models.load_model(path)
     except:
@@ -109,10 +109,10 @@ preds = [
 ]
 
 # Build model, inspector, and visualization
-if load_model("./model/saved_model.pb") is None:
+if load_saved_model("./model/saved_model.pb") is None:
     model = build_model(training)
 else:
-    model = load_model("./model/saved_model.pb")
+    model = load_saved_model("./model/saved_model.pb")
 inspector = model.make_inspector()
 viz = build_viz(model, training, inspector)
 
