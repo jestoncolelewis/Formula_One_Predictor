@@ -113,7 +113,7 @@ if load_saved_model("./model/saved_model.pb") is None:
 else:
     model = load_saved_model("./model/saved_model.pb")
 inspector = model.make_inspector()
-viz = build_viz(model, training, inspector)
+# viz = build_viz(model, training, inspector)
 
 # Evaluator
 evaluation = inspector.evaluation()
@@ -160,7 +160,7 @@ col1.header("Grid vs Position")
 col1.pyplot(lmplot.fig)
 col2.title("Visualizations of the model")
 col2.header("Single tree plot")
-col2.image(viz, use_column_width=True) # Plot tree
+# col2.image(viz, use_column_width=True) # Plot tree
 
 # TAB 2
 # Prediction form
