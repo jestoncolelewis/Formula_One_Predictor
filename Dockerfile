@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
 COPY streamlit_app.py /app
 COPY requirements.txt /app
 COPY ./data /app/data
+COPY ./model /app/model
 
 RUN pip3 install --upgrade pip
 RUN pip3 install --no-binary=h5py h5py
