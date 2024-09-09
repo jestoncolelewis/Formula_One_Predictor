@@ -128,42 +128,14 @@ single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
 
 # Data visualization
-lmplot = sns.lmplot(x="position", y="grid", data=data, fit_reg=False, hue="position")
+lmplot = sns.lmplot(x="pos_delta", y="grid", data=training, fit_reg=False)
 
 # FRONTEND
 st.title("Jeston Lewis - Capstone Project")
 predictor, analysis = st.tabs(["Predictor", "Analysis"])
 
-# TAB 1
-analysis.title("Single race prediction")
-analysis.write(f"Test accuracy - {eval_perc:.2f}%")
-analysis.write("The table below shows the likelihood of each driver achieving a specific finishing position giving their "
-           "starting position or grid. For instance, the person in first at the beginning of the race (Leclerc), has a "
-           "1.67% chance of winning the race.")
-analysis.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
-           "position indicated by the column name. Hamilton has a 83% chance of finishing in 1st.")
-analysis.dataframe(
-    single.style.format(
-        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
-                         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
-                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
-    ).highlight_max(
-        axis=1,
-        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
-    use_container_width=True,
-    hide_index=True,
-    height=738,
-) # Single race prediction
-col1, col2 = analysis.columns(2)
-col1.title("Visualizations of the data")
-col1.header("Grid vs Position")
-col1.pyplot(lmplot.fig)
-col2.title("Visualizations of the model")
-col2.header("Single tree plot")
-# col2.image(viz, use_column_width=True) # Plot tree
 
-# TAB 2
-# Prediction form
+# Predictor
 predictor.title("Race predictor")
 predictor.write("1 - Select a driver")
 predictor.write("2 - Select a track")
@@ -211,3 +183,41 @@ if submit is True and f_driver_choice is not None and f_circuit_choice is not No
     )
 if submit is True and f_driver_choice is None or f_circuit_choice is None or f_starting_choice is None:
     predictor.write("Please select all options.")
+
+# Analysis
+analysis.title("Visualizations of the data")
+analysis.header("Description of the training data")
+analysis.dataframe(training.describe(), use_container_width=True)
+container1 = analysis.container()
+col1, col2 = container1.columns(2)
+col1.header("Grid vs Position Delta")
+col1.write("Starting position versus the change in position over the course of a race")
+col1.pyplot(lmplot.fig)
+col2.header("Header for other visual")
+col2.write("")
+container2 = analysis.container()
+container2.title("Single race prediction")
+container2.write(f"Test accuracy - {eval_perc:.2f}%")
+container2.write("The table below shows the likelihood of each driver achieving a specific finishing position giving their "
+           "starting position or grid. For instance, the person in first at the beginning of the race (Leclerc), has a "
+           "1.67% chance of winning the race.")
+container2.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
+           "position indicated by the column name. Hamilton has a 83% chance of finishing in 1st.")
+container2.dataframe(
+    single.style.format(
+        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
+                         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
+                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
+    ).highlight_max(
+        axis=1,
+        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+    use_container_width=True,
+    hide_index=True,
+    height=738,
+) # Single race prediction
+container3 = analysis.container()
+container3.title("Visualizations of the model")
+col3, col4 = container3.columns(2)
+col3.header("Single tree plot")
+# col3.image(viz, use_column_width=True) # Plot tree
+col4.header("Confusion matrix")
