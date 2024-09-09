@@ -92,6 +92,7 @@ def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_d
 
 # Data prep
 data = build_data("./data/final_rolling.csv")
+hamilton_result = data[data["driverRef"].isin(["Hamilton"])]
 training = data[data["year"] < 2022]
 test = data[data["year"] >= 2022]
 current_season = data[data["year"] == data["year"].max()]
@@ -196,8 +197,9 @@ col1, col2 = container1.columns(2)
 col1.header("Grid vs Position Delta")
 col1.write("Starting position versus the change in position over the course of a race")
 col1.pyplot(lmplot.fig)
-col2.header("Header for other visual")
-col2.write("")
+col2.header("Wins per year")
+col2.write("Wins for Lewis Hamilton by year")
+col2.bar_chart(hamilton_result[hamilton_result["position"].isin([1])], x="year", y="position")
 container2 = analysis.container()
 container2.title("Single race prediction")
 container2.write(f"Test accuracy - {eval_perc:.2f}%")
