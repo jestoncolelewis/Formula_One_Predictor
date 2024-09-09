@@ -58,7 +58,7 @@ def make_prediction(local_model, local_data):
     predictions = local_model.predict(local_data_ds)
     predictions_df = pd.DataFrame(predictions)
     local_table = pd.merge(local_data, predictions_df, on=local_data.index)
-    return local_table
+    return local_table, predictions
 
 
 def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_data, local_circuits):
@@ -120,7 +120,7 @@ evaluation = inspector.evaluation()
 eval_perc = evaluation.accuracy * 100
 
 # Single race table
-full_table = make_prediction(model, test)
+full_table, predictions = make_prediction(model, test)
 single = full_table[
     ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 ].loc[full_table["raceId"] == full_table["raceId"].max()]
@@ -129,6 +129,9 @@ single["grid"] = single["grid"].astype(int)
 
 # Data visualization
 lmplot = sns.lmplot(x="pos_delta", y="grid", data=training, fit_reg=False)
+one_prediction = tf.argmax(predictions, axis=-1)
+cm = tf.math.confusion_matrix(labels=test["position"], predictions=one_prediction)
+cm_df = pd.DataFrame(cm)
 
 # FRONTEND
 st.title("Jeston Lewis - Capstone Project")
@@ -221,3 +224,5 @@ col3, col4 = container3.columns(2)
 col3.header("Single tree plot")
 col3.image("tree.svg", use_column_width=True) # Plot tree
 col4.header("Confusion matrix")
+container3.header("Confusion matrix")
+container3.dataframe(cm_df.style.background_gradient(cmap="coolwarm"), use_container_width=False, height=772)
