@@ -219,5 +219,5 @@ container3 = analysis.container()
 container3.title("Visualizations of the model")
 col3, col4 = container3.columns(2)
 col3.header("Single tree plot")
-# col3.image(viz, use_column_width=True) # Plot tree
+col3.image("tree.svg", use_column_width=True) # Plot tree
 col4.header("Confusion matrix")
