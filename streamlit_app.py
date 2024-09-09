@@ -220,9 +220,7 @@ container2.dataframe(
 ) # Single race prediction
 container3 = analysis.container()
 container3.title("Visualizations of the model")
-col3, col4 = container3.columns(2)
-col3.header("Single tree plot")
-col3.image("tree.svg", use_column_width=True) # Plot tree
-col4.header("Confusion matrix")
+container3.header("Single tree plot")
+container3.image("tree.svg", use_column_width=True) # Plot tree
 container3.header("Confusion matrix")
 container3.dataframe(cm_df.style.background_gradient(cmap="coolwarm"), use_container_width=False, height=772)
