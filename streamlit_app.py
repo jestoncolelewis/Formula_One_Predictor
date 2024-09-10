@@ -3,7 +3,6 @@ import pandas as pd
 import seaborn as sns
 import tensorflow as tf
 import tensorflow_decision_forests as tfdf
-import dtreeviz as dt
 
 st.set_page_config(
     page_title="Jeston Lewis | Capstone",
