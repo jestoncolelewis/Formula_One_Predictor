@@ -37,22 +37,6 @@ def build_model(local_training):
     return local_model
 
 
-def build_viz(local_model, local_data, local_inspector):
-    local_data.dropna(inplace=True)
-    features = [f.name for f in local_inspector.features()]
-    viz_model = dt.model(
-        model=local_model,
-        X_train=local_data[features],
-        y_train=local_data["position"]-1,
-        feature_names=features,
-        target_name="position",
-        tree_index=0
-    )
-    local_viz = viz_model.view(depth_range_to_display=(0,3), scale=0.75, orientation="LR")
-    viz_svg = local_viz.svg()
-    return viz_svg
-
-
 def make_prediction(local_model, local_data):
     local_data_ds = tfdf.keras.pd_dataframe_to_tf_dataset(local_data[predictors])
     predictions = local_model.predict(local_data_ds)
@@ -114,7 +98,6 @@ if load_saved_model("./model/saved_model.pb") is None:
 else:
     model = load_saved_model("./model/saved_model.pb")
 inspector = model.make_inspector()
-# viz = build_viz(model, training, inspector)
 
 # Evaluator
 evaluation = inspector.evaluation()
