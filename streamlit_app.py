@@ -23,7 +23,8 @@ def build_data(path):
 def load_saved_model(path):
     try:
         return tf.keras.models.load_model(path)
-    except:
+    except (OSError, ValueError, ImportError) as e:
+        st.warning(f"Failed to load saved model: {e}")
         return None
 
 
@@ -52,6 +53,8 @@ def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_d
     position_rolling = local_data["position_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     pos_delta_rolling = local_data["pos_delta_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
     pos_delta = starting_choice
+    # Use position_rolling as estimate for position since we're predicting a future race
+    position = int(round(position_rolling))
     driver_df = pd.DataFrame(
         {
             "driver_code": [driver_code],
@@ -61,6 +64,7 @@ def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_d
             "position_rolling": [position_rolling],
             "pos_delta_rolling": [pos_delta_rolling],
             "grid": [starting_choice],
+            "position": [position],
             "pos_delta": [pos_delta]
         }
     )
@@ -167,7 +171,7 @@ if submit is True and f_driver_choice is not None and f_circuit_choice is not No
         use_container_width=True,
         hide_index=True
     )
-if submit is True and f_driver_choice is None or f_circuit_choice is None or f_starting_choice is None:
+if submit is True and (f_driver_choice is None or f_circuit_choice is None or f_starting_choice is None):
     predictor.write("Please select all options.")
 
 # Analysis

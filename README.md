@@ -9,5 +9,5 @@ The view a running version of this project, visit [this](https://f1-predictor.st
 4. Open a terminal
 5. In your terminal `cd` into the director for the Formula One Predictor
 6. Run the command `bash setup.sh`
-7. After all requirements are installed, run the command `streamlit run sreamlit_app.py`
+7. After all requirements are installed, run the command `streamlit run streamlit_app.py`
 8. Navigate to your browser
