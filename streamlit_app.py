@@ -4,6 +4,10 @@ import seaborn as sns
 import tensorflow as tf
 import tensorflow_decision_forests as tfdf
 
+# Constants
+POSITION_COLUMNS = list(range(1, 21))  # Finishing positions 1-20
+POSITION_FORMAT = {col: "{:.2%}" for col in POSITION_COLUMNS}  # Percentage formatting for all positions
+
 st.set_page_config(
     page_title="Jeston Lewis | Capstone",
     layout="wide",
@@ -13,10 +17,26 @@ st.set_page_config(
 
 @st.cache_data
 def build_data(path):
-    local_data = pd.read_csv(path)
-    local_data.dropna(subset="position", inplace=True)
-    local_data["position"] = local_data["position"].astype("int")
-    return local_data
+    try:
+        local_data = pd.read_csv(path)
+        if local_data.empty:
+            st.error(f"Data file {path} is empty")
+            st.stop()
+        local_data.dropna(subset="position", inplace=True)
+        local_data["position"] = local_data["position"].astype("int")
+        return local_data
+    except FileNotFoundError:
+        st.error(f"Data file not found: {path}")
+        st.stop()
+    except pd.errors.EmptyDataError:
+        st.error(f"Data file is empty or corrupted: {path}")
+        st.stop()
+    except KeyError as e:
+        st.error(f"Required column missing in data file: {e}")
+        st.stop()
+    except Exception as e:
+        st.error(f"Error loading data from {path}: {e}")
+        st.stop()
 
 
 @st.cache_resource
@@ -46,12 +66,16 @@ def make_prediction(local_model, local_data):
 
 
 def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_data, local_circuits):
-    driver_code = local_data["driver_code"].loc[local_data["driverRef"] == driver_choice].values[0]
-    constructor_code = local_data["constructor_code"].loc[local_data["driverRef"] == driver_choice].values[0]
-    circuit_code = local_circuits["circuit_code"].loc[local_circuits["circuitRef"] == circuit_choice].values[0]
-    grid_rolling = local_data["grid_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
-    position_rolling = local_data["position_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
-    pos_delta_rolling = local_data["pos_delta_rolling"].loc[local_data["driverRef"] == driver_choice].values[0]
+    # Optimize: Single lookup instead of 6 separate queries
+    driver_data = local_data[local_data["driverRef"] == driver_choice].iloc[0]
+    circuit_data = local_circuits[local_circuits["circuitRef"] == circuit_choice].iloc[0]
+
+    driver_code = driver_data["driver_code"]
+    constructor_code = driver_data["constructor_code"]
+    circuit_code = circuit_data["circuit_code"]
+    grid_rolling = driver_data["grid_rolling"]
+    position_rolling = driver_data["position_rolling"]
+    pos_delta_rolling = driver_data["pos_delta_rolling"]
     pos_delta = starting_choice
     # Use position_rolling as estimate for position since we're predicting a future race
     position = int(round(position_rolling))
@@ -74,7 +98,7 @@ def make_form_prediction(driver_choice, circuit_choice, starting_choice, local_d
     driver_full = pd.merge(driver_df, driver_prediction_df, on=driver_df.index)
     driver_full["driverRef"] = driver_choice
     driver_full["circuit_choice"] = circuit_choice
-    return driver_full[["driverRef", "circuit_choice", "grid", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]]
+    return driver_full[["driverRef", "circuit_choice", "grid"] + POSITION_COLUMNS]
 
 
 # Data prep
@@ -91,9 +115,6 @@ predictors = [
     "grid", "position", "pos_delta", "driver_code", "constructor_code", "circuit_code", "grid_rolling",
     "position_rolling", "pos_delta_rolling"
 ]
-preds = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
-]
 
 # Build model, inspector, and visualization
 if load_saved_model("./model/saved_model.pb") is None:
@@ -109,7 +130,7 @@ eval_perc = evaluation.accuracy * 100
 # Single race table
 full_table, predictions = make_prediction(model, test)
 single = full_table[
-    ["driverRef", "grid", "circuitRef", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    ["driverRef", "grid", "circuitRef"] + POSITION_COLUMNS
 ].loc[full_table["raceId"] == full_table["raceId"].max()]
 single.sort_values(by="grid", inplace=True)
 single["grid"] = single["grid"].astype(int)
@@ -161,13 +182,9 @@ if submit is True and f_driver_choice is not None and f_circuit_choice is not No
         local_data=current_season[current_season["raceId"] == current_season["raceId"].max()],
         local_circuits=circuits
     )
-    predictor.dataframe(prediction.style.format(
-        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
-         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
-         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
-    ).highlight_max(
+    predictor.dataframe(prediction.style.format(POSITION_FORMAT).highlight_max(
         axis=1,
-        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+        subset=POSITION_COLUMNS),
         use_container_width=True,
         hide_index=True
     )
@@ -195,13 +212,9 @@ container2.write("The table below shows the likelihood of each driver achieving 
 container2.write("The highlighted percentage next to each driver shows the predicted likelihood of him finishing in the "
            "position indicated by the column name. Hamilton has a 83% chance of finishing in 1st.")
 container2.dataframe(
-    single.style.format(
-        {1:"{:.2%}", 2:"{:.2%}", 3:"{:.2%}", 4:"{:.2%}", 5:"{:.2%}", 6:"{:.2%}", 7:"{:.2%}", 8:"{:.2%}",
-                         9:"{:.2%}", 10:"{:.2%}", 11:"{:.2%}", 12:"{:.2%}", 13:"{:.2%}", 14:"{:.2%}", 15:"{:.2%}",
-                         16:"{:.2%}", 17:"{:.2%}", 18:"{:.2%}", 19:"{:.2%}", 20:"{:.2%}"}
-    ).highlight_max(
+    single.style.format(POSITION_FORMAT).highlight_max(
         axis=1,
-        subset=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+        subset=POSITION_COLUMNS),
     use_container_width=True,
     hide_index=True,
     height=738,
