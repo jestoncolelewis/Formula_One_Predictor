@@ -1,0 +1,121 @@
+<% content_for(:title) { "F1 Predictor - Analysis" } %>
+
+<h1>Analysis</h1>
+
+<% if @stats %>
+  <section class="stats-section">
+    <h2>Model Performance</h2>
+    <div class="stat-cards">
+      <div class="stat-card">
+        <span class="stat-value"><%= @stats["accuracy_pct"] %>%</span>
+        <span class="stat-label">Test Accuracy</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= @stats["training_rows"] %></span>
+        <span class="stat-label">Training Samples</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= @stats["total_rows"] %></span>
+        <span class="stat-label">Total Data Points</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="description-section">
+    <h2>Training Data Description</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <% @stats["description"].keys.each do |col| %>
+              <th><%= col %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% %w[count mean std min 25% 50% 75% max].each do |stat| %>
+            <tr>
+              <td><strong><%= stat %></strong></td>
+              <% @stats["description"].each do |_col, values| %>
+                <td><%= values[stat] ? number_with_precision(values[stat], precision: 2) : "-" %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<% if @single_race %>
+  <section class="single-race-section">
+    <h2>Single Race Prediction</h2>
+    <p>The table below shows the likelihood of each driver achieving a specific finishing position given their starting position (grid).</p>
+    <p>The highlighted percentage shows the most likely finishing position for each driver.</p>
+
+    <div class="table-wrapper">
+      <table class="probability-table">
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th>Grid</th>
+            <th>Circuit</th>
+            <% (1..20).each do |pos| %>
+              <th>P<%= pos %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @single_race["predictions"].each do |row| %>
+            <% max_pos = row["probabilities"].max_by { |_k, v| v }[0] %>
+            <tr>
+              <td><%= row["driver"] %></td>
+              <td><%= row["grid"] %></td>
+              <td><%= row["circuit"] %></td>
+              <% (1..20).each do |pos| %>
+                <% prob = row["probabilities"][pos.to_s] || 0 %>
+                <% is_max = pos.to_s == max_pos %>
+                <td class="<%= 'highlight' if is_max %>">
+                  <%= number_to_percentage(prob * 100, precision: 2) %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<% if @confusion_matrix %>
+  <section class="confusion-section">
+    <h2>Confusion Matrix</h2>
+    <div class="table-wrapper">
+      <table class="confusion-table">
+        <thead>
+          <tr>
+            <th></th>
+            <% @confusion_matrix["labels"].each do |label| %>
+              <th><%= label %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% max_val = @confusion_matrix["confusion_matrix"].flatten.max.to_f %>
+          <% @confusion_matrix["confusion_matrix"].each_with_index do |row, i| %>
+            <tr>
+              <td><strong><%= @confusion_matrix["labels"][i] || i %></strong></td>
+              <% row.each do |val| %>
+                <% intensity = max_val > 0 ? (val.to_f / max_val * 100).round : 0 %>
+                <td style="background-color: hsl(220, 80%, <%= 100 - intensity * 0.4 %>%);">
+                  <%= val %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>

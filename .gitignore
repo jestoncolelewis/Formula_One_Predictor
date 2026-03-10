@@ -4,3 +4,9 @@
 /.venv/
 /.idea/workspace.xml
 /model/
+db.sqlite3
+__pycache__/
+*.pyc
+/frontend/log/
+/frontend/tmp/
+/frontend/node_modules/

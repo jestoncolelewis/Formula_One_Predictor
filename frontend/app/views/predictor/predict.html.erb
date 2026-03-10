@@ -1,0 +1,44 @@
+<% content_for(:title) { "F1 Predictor - Results" } %>
+
+<h1>Prediction Results</h1>
+
+<div class="prediction-summary">
+  <p><strong>Driver:</strong> <%= @prediction["driver"] %></p>
+  <p><strong>Circuit:</strong> <%= @prediction["circuit"] %></p>
+  <p><strong>Grid Position:</strong> <%= @prediction["grid"] %></p>
+</div>
+
+<% probabilities = @prediction["probabilities"] %>
+<% max_pos = probabilities.max_by { |_k, v| v } %>
+
+<h2>Position Probabilities</h2>
+
+<div class="table-wrapper">
+  <table class="probability-table">
+    <thead>
+      <tr>
+        <% (1..20).each do |pos| %>
+          <th>P<%= pos %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <% (1..20).each do |pos| %>
+          <% prob = probabilities[pos.to_s] || 0 %>
+          <% is_max = pos.to_s == max_pos[0] %>
+          <td class="<%= 'highlight' if is_max %>">
+            <%= number_to_percentage(prob * 100, precision: 2) %>
+          </td>
+        <% end %>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p class="predicted-finish">
+  Predicted finish: <strong>P<%= max_pos[0] %></strong>
+  (<%= number_to_percentage(max_pos[1] * 100, precision: 2) %>)
+</p>
+
+<%= link_to "Make another prediction", root_path, class: "btn btn-secondary" %>

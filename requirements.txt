@@ -1,5 +1,0 @@
-streamlit
-pandas
-tensorflow-decision-forests
-matplotlib
-seaborn

@@ -1,0 +1,53 @@
+<% content_for(:title) { "F1 Predictor - Data Ingestion" } %>
+
+<h1>Data Ingestion</h1>
+<p>Fetch new race data from the Jolpica API and automatically retrain the model.</p>
+
+<section class="ingest-section">
+  <h2>1. Fetch Race Schedule</h2>
+  <%= form_tag admin_fetch_schedule_path, method: :post, class: "ingest-form" do %>
+    <div class="form-group">
+      <label for="year">Season Year</label>
+      <%= select_tag :year,
+          options_for_select((2010..Date.today.year).to_a.reverse),
+          class: "form-select" %>
+    </div>
+    <%= submit_tag "Fetch Schedule", class: "btn btn-secondary" %>
+  <% end %>
+</section>
+
+<% if @schedule %>
+  <section class="schedule-section">
+    <h2>2. Select a Race to Ingest</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Round</th>
+            <th>Race</th>
+            <th>Circuit</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @schedule.each do |race| %>
+            <tr>
+              <td><%= race["round"] %></td>
+              <td><%= race["raceName"] %></td>
+              <td><%= race["circuitName"] %></td>
+              <td><%= race["date"] %></td>
+              <td>
+                <%= form_tag admin_run_ingest_path, method: :post do %>
+                  <%= hidden_field_tag :year, @year %>
+                  <%= hidden_field_tag :round, race["round"] %>
+                  <%= submit_tag "Ingest", class: "btn btn-small" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>

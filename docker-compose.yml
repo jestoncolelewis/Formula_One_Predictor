@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - model_data:/app/model
+    environment:
+      - DATA_DIR=/app/data
+      - MODEL_DIR=/app/model
+      - DB_PATH=/app/db.sqlite3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - F1_API_URL=http://api:8000
+      - RAILS_ENV=production
+      - SECRET_KEY_BASE=placeholder_change_in_production
+    depends_on:
+      - api
+
+volumes:
+  model_data:

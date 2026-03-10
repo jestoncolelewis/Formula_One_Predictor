@@ -1,0 +1,38 @@
+<% content_for(:title) { "F1 Predictor - Race Prediction" } %>
+
+<h1>Race Predictor</h1>
+
+<div class="instructions">
+  <p>1. Select a driver</p>
+  <p>2. Select a track</p>
+  <p>3. Select a starting position</p>
+  <p>4. Press 'Predict'</p>
+</div>
+
+<%= form_tag predict_path, method: :post, class: "predict-form" do %>
+  <div class="form-group">
+    <label for="driver">Driver</label>
+    <%= select_tag :driver,
+        options_for_select(@drivers),
+        prompt: "Choose a driver",
+        class: "form-select" %>
+  </div>
+
+  <div class="form-group">
+    <label for="circuit">Circuit</label>
+    <%= select_tag :circuit,
+        options_for_select(@circuits.map { |c| [c["circuitRef"], c["circuitRef"]] }),
+        prompt: "Choose a circuit",
+        class: "form-select" %>
+  </div>
+
+  <div class="form-group">
+    <label for="grid">Starting Position</label>
+    <%= select_tag :grid,
+        options_for_select(@grid_positions),
+        prompt: "Choose a starting position",
+        class: "form-select" %>
+  </div>
+
+  <%= submit_tag "Predict", class: "btn btn-primary" %>
+<% end %>
