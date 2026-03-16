@@ -1,24 +1,32 @@
-# README
+# F1 Predictor Frontend
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Ruby on Rails frontend for the Formula One race position predictor. Communicates with the F1 Predictor API for ML predictions and data.
 
-Things you may want to cover:
+## Pages
 
-* Ruby version
+- **Predictor** (`/`) — Select a driver, circuit, and grid position to see finishing probabilities
+- **Analysis** (`/analysis`) — Model accuracy, training data stats, single-race predictions, confusion matrix
+- **Data Ingest** (`/admin/ingest`) — Fetch season schedules and ingest new race results
 
-* System dependencies
+## Setup
 
-* Configuration
+```bash
+bundle install
+F1_API_URL=http://localhost:8000 bin/rails server -p 3000
+```
 
-* Database creation
+Requires the API service running at `F1_API_URL`.
 
-* Database initialization
+## Docker
 
-* How to run the test suite
+```bash
+docker build -t f1-predictor-frontend .
+docker run -p 3000:80 -e F1_API_URL=http://your-api-url:8000 -e SECRET_KEY_BASE=your-secret f1-predictor-frontend
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## Railway Deployment
 
-* Deployment instructions
-
-* ...
+Set these environment variables in Railway:
+- `F1_API_URL` — URL of your deployed F1 Predictor API
+- `SECRET_KEY_BASE` — generate with `bin/rails secret`
+- `RAILS_ENV` — `production`

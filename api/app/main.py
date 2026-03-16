@@ -5,15 +5,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from api.database import init_db
-from api.data_pipeline import (
+from app.database import init_db
+from app.data_pipeline import (
     PREDICTORS, POSITION_COLUMNS,
     load_data_from_csv, load_data_from_db, save_data_to_db,
     process_raw_results, get_current_season, get_circuits_list,
     get_training_test_split,
 )
-from api.model import f1_model
-from api.ingestion import fetch_race_results, fetch_season_schedule
+from app.model import f1_model
+from app.ingestion import fetch_race_results, fetch_season_schedule
 
 import pandas as pd
 

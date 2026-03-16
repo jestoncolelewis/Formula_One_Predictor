@@ -7,8 +7,8 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from api.database import init_db
-from api.data_pipeline import load_data_from_csv, save_data_to_db, load_data_from_db
+from app.database import init_db
+from app.data_pipeline import load_data_from_csv, save_data_to_db, load_data_from_db
 
 CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "final_rolling.csv")
 

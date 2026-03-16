@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from api.database import SessionLocal, RaceResult
+from app.database import SessionLocal, RaceResult
 
 
 PREDICTORS = [

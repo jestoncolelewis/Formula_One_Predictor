@@ -1,12 +1,10 @@
 services:
   api:
     build:
-      context: .
-      dockerfile: api/Dockerfile
+      context: ./api
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
       - model_data:/app/model
     environment:
       - DATA_DIR=/app/data
@@ -16,9 +14,8 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - F1_API_URL=http://api:8000
       - RAILS_ENV=production

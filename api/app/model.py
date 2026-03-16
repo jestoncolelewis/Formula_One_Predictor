@@ -5,8 +5,8 @@ import pandas as pd
 import tensorflow as tf
 import tensorflow_decision_forests as tfdf
 
-from api.data_pipeline import PREDICTORS, POSITION_COLUMNS
-from api.database import SessionLocal, ModelRun
+from app.data_pipeline import PREDICTORS, POSITION_COLUMNS
+from app.database import SessionLocal, ModelRun
 
 MODEL_DIR = os.environ.get("MODEL_DIR", os.path.join(os.path.dirname(__file__), "..", "model"))
 
