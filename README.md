@@ -5,12 +5,34 @@ An F1 race position predictor using TensorFlow Decision Forests, split into two 
 
 ## Architecture
 
-| Service | Directory | Stack |
-|---------|-----------|-------|
+| Service | Directory | Deploys as |
+|---------|-----------|------------|
 | **API** | `api/` | Python FastAPI — ML inference, data pipeline, Jolpica ingestion |
 | **Frontend** | `frontend/` | Ruby on Rails — predictor form, analysis dashboard, admin panel |
 
 Each directory is a standalone project with its own Dockerfile, README, and dependencies. They communicate over HTTP via the `F1_API_URL` environment variable.
+
+## Splitting into Separate Repos
+
+Each service is self-contained and ready to be pushed to its own repo:
+
+```bash
+# API repo
+gh repo create jestoncolelewis/f1-predictor-api --public
+cd api
+git init && git add -A && git commit -m "initial commit"
+git remote add origin https://github.com/jestoncolelewis/f1-predictor-api.git
+git push -u origin main
+
+# Frontend repo
+gh repo create jestoncolelewis/f1-predictor-frontend --public
+cd ../frontend
+git init && git add -A && git commit -m "initial commit"
+git remote add origin https://github.com/jestoncolelewis/f1-predictor-frontend.git
+git push -u origin main
+```
+
+Then create a Railway project per repo and set the environment variables listed in each service's README.
 
 ## Quick Start (both services locally)
 
@@ -20,30 +42,6 @@ docker-compose up --build
 
 - Frontend: http://localhost:3000
 - API: http://localhost:8000
-
-## Railway Deployment
-
-Both services deploy as a single Railway project with two services:
-
-1. Create a new project in Railway
-2. Add a service for the **API**: point it at this repo, set the root directory to `api/`
-3. Add a service for the **Frontend**: point it at this repo, set the root directory to `frontend/`
-4. Set environment variables:
-
-**API service:**
-| Variable | Value |
-|----------|-------|
-| `DB_PATH` | `/app/db.sqlite3` (attach a volume for persistence) |
-| `MODEL_DIR` | `/app/model` (attach a volume for persistence) |
-
-**Frontend service:**
-| Variable | Value |
-|----------|-------|
-| `F1_API_URL` | Internal Railway URL of the API service (e.g. `http://api.railway.internal:8000`) |
-| `SECRET_KEY_BASE` | Generate with `bin/rails secret` |
-| `RAILS_ENV` | `production` |
-
-Railway auto-detects the Dockerfile in each root directory. Pushing changes to `api/` only rebuilds the API service, and pushing changes to `frontend/` only rebuilds the frontend.
 
 ## Data Ingestion
 

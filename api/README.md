@@ -22,7 +22,7 @@ docker run -p 8000:8000 f1-predictor-api
 
 ## Railway Deployment
 
-In Railway, add this as a service with root directory set to `api/`. Set these environment variables:
+Create a Railway project from this repo. Set these environment variables:
 - `DB_PATH` — path to SQLite file (attach a volume for persistence)
 - `MODEL_DIR` — path to model directory (attach a volume for persistence)
 
