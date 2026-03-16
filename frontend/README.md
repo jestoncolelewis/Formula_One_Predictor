@@ -26,7 +26,9 @@ docker run -p 3000:80 -e F1_API_URL=http://your-api-url:8000 -e SECRET_KEY_BASE=
 
 ## Railway Deployment
 
-Set these environment variables in Railway:
-- `F1_API_URL` — URL of your deployed F1 Predictor API
+In Railway, add this as a service with root directory set to `frontend/`. Set these environment variables:
+- `F1_API_URL` — Internal Railway URL of the API service (e.g. `http://api.railway.internal:8000`)
 - `SECRET_KEY_BASE` — generate with `bin/rails secret`
 - `RAILS_ENV` — `production`
+
+Railway auto-detects the Dockerfile.

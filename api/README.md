@@ -22,11 +22,11 @@ docker run -p 8000:8000 f1-predictor-api
 
 ## Railway Deployment
 
-Set these environment variables in Railway:
-- `DB_PATH` — path to SQLite file (use a Railway volume for persistence)
-- `MODEL_DIR` — path to model directory (use a Railway volume)
+In Railway, add this as a service with root directory set to `api/`. Set these environment variables:
+- `DB_PATH` — path to SQLite file (attach a volume for persistence)
+- `MODEL_DIR` — path to model directory (attach a volume for persistence)
 
-Start command:
+Railway auto-detects the Dockerfile. Custom start command if not using Docker:
 ```
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
